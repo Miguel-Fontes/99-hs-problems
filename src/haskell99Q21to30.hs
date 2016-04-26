@@ -52,6 +52,3 @@ breakTree (Node xs [Empty]) = Node xs (map (\v -> Node [v] [Empty]) xs)
 computeTree :: CombTree [a] -> CombTree [a]
 computeTree (Node v (x:xs)) = makeTree sufixes
     where sufixes = filter (\a -> a /= getV x) v
-
-
--- https://en.wikipedia.org/wiki/Permutation
