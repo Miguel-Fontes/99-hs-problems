@@ -35,27 +35,50 @@ diff_select x y = let rad = fst (randomR (1 , y) (mkStdGen (x*10000*y)) :: (Int,
 -- [25] --- Generate a random permutation of the elements of a list -----------------------------------------
 -- rnd_permu "abcdef" => "badcef"
 rnd_permu :: [a] -> [a]
-rnd_permu x = x
+rnd_permu x = undefined
 
 
 -- [26] --- Generate the combinations of K distinct objects chosen from the N elements of a list ------------
---data CombTree a = Node a [CombTree a] | Empty deriving (Show) -- Implementar EQ
+-- Combinations
+combinationsNo :: (Ord a, Fractional a) => a -> a -> a
+combinationsNo n r = factorial n / (factorial r * factorial(n - r))
 
-combinatory :: Eq a => Int -> [a] -> [[a]]
-combinatory n xs
-    | n == 0 = [xs]
-    | n == 1 = breakList xs
-    | n > length xs = [xs]
-    | otherwise =  combinatoryIter n (breakList xs)
-    where combinatoryIter n ds
-              | n > 1 = combinatoryIter (n-1) (concat $ map (combine xs) ds)
+--combination :: [a] -> Int -> [[a]]
+--combination xs r = combinationIter xs []
+--    where combinationIter [] z = z
+--          combinationIter (x:xs) z = combinationIter (xs) (z ++ map (\y -> x:y:[]) xs)
+
+combination :: [a] -> Int -> [[a]]
+combination xs r = combinationIter xs []
+    where combinationIter [] z = z
+          combinationIter (x:xs) z = combinationIter (xs) (z ++ map (\y -> x:y:[]) xs)
+
+-- Permutations
+permutation :: Eq a => Int -> [a] -> [[a]]
+permutation r ns
+    | r == 0 = [ns]
+    | r == 1 = breakList ns
+    | r > length ns = [ns]
+    | otherwise =  permutationIter r (breakList ns)
+    where permutationIter r' ds
+              | r' > 1 = permutationIter (r' - 1) (concat $ map (permute ns) ds)
               | otherwise = ds
 
-combine :: Eq a => [a] -> [a] -> [[a]]
-combine ds xs = foldr step [] uniqueDs
+permute :: Eq a => [a] -> [a] -> [[a]]
+permute ds xs = foldr step [] uniqueDs
     where step d acc = (xs ++ [d]) : acc
           uniqueDs = filter (\x -> not (x `elem` xs)) ds
 
 breakList :: [a] -> [[a]]
-breakList xs = map buildNode xs
-    where buildNode x = [x]
+breakList xs = map toSublist xs
+    where toSublist x = [x]
+
+-- Validate our result
+permutationsNo :: (Ord a, Fractional a) => a -> a -> a
+permutationsNo n r = (factorial n) / (factorial (n-r))
+
+factorial :: (Num a, Ord a) => a -> a
+factorial x = factIter 1 1 x
+    where factIter a b n
+              | n > 0 = factIter (a * b) (b+1) (n-1)
+              | otherwise = a
