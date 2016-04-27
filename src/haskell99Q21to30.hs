@@ -39,16 +39,23 @@ rnd_permu x = x
 
 
 -- [26] --- Generate the combinations of K distinct objects chosen from the N elements of a list ------------
-data CombTree a = Node a [CombTree a] | Empty deriving (Show)
+--data CombTree a = Node a [CombTree a] | Empty deriving (Show) -- Implementar EQ
 
-makeTree :: [a] -> CombTree [a]
-makeTree xs = breakTree $ Node xs [Empty]
+combinatory :: Eq a => Int -> [a] -> [[a]]
+combinatory n xs
+    | n == 0 = [xs]
+    | n == 1 = breakList xs
+    | n > length xs = [xs]
+    | otherwise =  combinatoryIter n (breakList xs)
+    where combinatoryIter n ds
+              | n > 1 = combinatoryIter (n-1) (concat $ map (combine xs) ds)
+              | otherwise = ds
 
-getV (Node v _) = v
+combine :: Eq a => [a] -> [a] -> [[a]]
+combine ds xs = foldr step [] uniqueDs
+    where step d acc = (xs ++ [d]) : acc
+          uniqueDs = filter (\x -> not (x `elem` xs)) ds
 
-breakTree :: CombTree [a] -> CombTree [a]
-breakTree (Node xs [Empty]) = Node xs (map (\v -> Node [v] [Empty]) xs)
-
-computeTree :: CombTree [a] -> CombTree [a]
-computeTree (Node v (x:xs)) = makeTree sufixes
-    where sufixes = filter (\a -> a /= getV x) v
+breakList :: [a] -> [[a]]
+breakList xs = map buildNode xs
+    where buildNode x = [x]
