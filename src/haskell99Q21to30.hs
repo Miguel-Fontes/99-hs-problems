@@ -40,9 +40,8 @@ rnd_permu x = undefined
 
 -- [26] --- Generate the combinations of K distinct objects chosen from the N elements of a list ------------
 -- Combinations
-combinationsNo :: (Ord a, Fractional a) => a -> a -> a
-combinationsNo n r = factorial n / (factorial r * factorial(n - r))
 
+-- That's a little tricky implementation. At least for list comprehensions untrained brain.
 -- n = 2 xs = [1,2,3]
 -- [[1,2,3] !! i : y | i <- [0], y <- [[2], [3]] ] => [1,2] : [1,3]
 -- [[1,2,3] !! i : y | i <- [1], y <- [[3]] ] => [2,3]
@@ -52,9 +51,26 @@ combinations 0 _ = [[]]
 combinations n xs = [ xs !! i : x | i <- [0..(length xs)-1]
                                   , x <- combinations (n-1) (drop (i+1) xs) ]
 
+-- Permutations. Just for For fun.
+permutations :: Eq a => Int -> [a] -> [[a]]
+permutations' 0 _ = [[]]
+permutations' n xs = [ x:y | x <- xs, y <- permutations' (n-1) (filter (/=x) xs) ]
 
--- Permutations
-permutation :: Eq a => Int -> [a] -> [[a]]
+-- Validate our result
+combinationsNo :: (Ord a, Fractional a) => a -> a -> a
+combinationsNo n r = factorial n / (factorial r * factorial(n - r))
+
+permutationsNo :: (Ord a, Fractional a) => a -> a -> a
+permutationsNo n r = (factorial n) / (factorial (n-r))
+
+factorial :: (Num a, Ord a) => a -> a
+factorial x = factIter 1 1 x
+    where factIter a b n
+              | n > 0 = factIter (a * b) (b+1) (n-1)
+              | otherwise = a
+
+--Old code with bad style. Note to self: Never write such ugly non-ellegant code again, please.
+permutations' :: Eq a => Int -> [a] -> [[a]]
 permutation r ns
     | r == 0 = [ns]
     | r == 1 = breakList ns
@@ -73,12 +89,4 @@ breakList :: [a] -> [[a]]
 breakList xs = map toSublist xs
     where toSublist x = [x]
 
--- Validate our result
-permutationsNo :: (Ord a, Fractional a) => a -> a -> a
-permutationsNo n r = (factorial n) / (factorial (n-r))
 
-factorial :: (Num a, Ord a) => a -> a
-factorial x = factIter 1 1 x
-    where factIter a b n
-              | n > 0 = factIter (a * b) (b+1) (n-1)
-              | otherwise = a
