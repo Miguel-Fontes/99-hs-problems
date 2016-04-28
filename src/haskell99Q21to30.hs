@@ -43,15 +43,15 @@ rnd_permu x = undefined
 combinationsNo :: (Ord a, Fractional a) => a -> a -> a
 combinationsNo n r = factorial n / (factorial r * factorial(n - r))
 
---combination :: [a] -> Int -> [[a]]
---combination xs r = combinationIter xs []
---    where combinationIter [] z = z
---          combinationIter (x:xs) z = combinationIter (xs) (z ++ map (\y -> x:y:[]) xs)
+-- n = 2 xs = [1,2,3]
+-- [[1,2,3] !! i : y | i <- [0], y <- [[2], [3]] ] => [1,2] : [1,3]
+-- [[1,2,3] !! i : y | i <- [1], y <- [[3]] ] => [2,3]
+-- [[1,2,3] !! i : y | i <- [2], y <- [] ] => []
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _ = [[]]
+combinations n xs = [ xs !! i : x | i <- [0..(length xs)-1]
+                                  , x <- combinations (n-1) (drop (i+1) xs) ]
 
-combination :: [a] -> Int -> [[a]]
-combination xs r = combinationIter xs []
-    where combinationIter [] z = z
-          combinationIter (x:xs) z = combinationIter (xs) (z ++ map (\y -> x:y:[]) xs)
 
 -- Permutations
 permutation :: Eq a => Int -> [a] -> [[a]]
